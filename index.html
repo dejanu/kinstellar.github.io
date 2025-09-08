@@ -440,14 +440,14 @@
     <script>
         // System message configuration
         const totalQuestions = 4; //set no of questions here
-        const subjectInterview = "SAP S/4 HANA and SQL"; //set subject here
+        const subjectInterview = "SAP Datasphere"; //set subject here
 
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('questionCount').textContent = totalQuestions;
         });
         const SYSTEM_MESSAGE = {
             role: "system",
-            content: `You are an interviewer. Your task is to assess the candidate's knowledge of ${subjectInterview}. You will ask exactly ${totalQuestions} technical questions. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide any answers, feedback, hints, or evaluation until all ${totalQuestions} questions have been answered. At the end of the interview, provide a short summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`
+            content: `You are an interviewer. Your task is to assess the candidate's knowledge of ${subjectInterview}. You will ask exactly ${totalQuestions} technical questions. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide any answers, feedback, hints, or evaluation until all ${totalQuestions} questions have been answered. At the end of the interview, provide a short, obiective summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`
         };
 
         // Interview state
@@ -457,8 +457,8 @@
         
         // Timer state
         let questionTimer = null;
-        let timeRemaining = 30;
-        const QUESTION_TIME_LIMIT = 30; // seconds
+        let timeRemaining = 50;
+        const QUESTION_TIME_LIMIT = 50; // seconds
 
 
         function startInterview() {
