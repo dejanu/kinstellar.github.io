@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillPulse</title>
     <style>
         /* === DESIGN SYSTEM: TEAL-BASED HARMONIZED PALETTE === */
@@ -317,20 +318,36 @@
         /* Responsive design */
         @media (max-width: 768px) {
             body {
-                padding: 16px;
+                padding: 8px;
+                font-size: 16px;
             }
-            
             .container {
-                padding: 20px;
+                padding: 10px;
+                border-radius: 8px;
             }
-            
-            input[type="password"], input[type="text"] {
+            h1 {
+                font-size: 1.5rem;
+            }
+            .setup-section, .question-section, .answer-section, .progress-section, .final-summary {
+                padding: 12px;
+                border-radius: 8px;
+            }
+            input[type="password"], input[type="text"], textarea {
                 max-width: 100%;
+                font-size: 15px;
+                padding: 10px 12px;
             }
-            
             button {
                 width: 100%;
                 margin: 8px 0;
+                font-size: 15px;
+                padding: 12px 0;
+            }
+            img {
+                max-width: 100px;
+            }
+            .question-text {
+                font-size: 15px;
             }
         }
     </style>
@@ -362,11 +379,22 @@
         <!-- Setup Section -->
         <div class="setup-section" id="setupSection">
             <h3>Interview Setup</h3>
-            <p>This is a technical interview focusing on Kubernetes and Docker. You'll be asked <span id="questionCount"></span> questions that <b>adapt</b> to your knowledge level.</p>
+            <p>
+            This is a technical interview concerning 
+            <span id="subjectInterview"></span>, 
+            You'll be asked <span id="questionCount"></span> questions that <b>adapt</b> to your knowledge level.
+            </p>
             <input type="password" id="apiKey" placeholder="Enter your OpenAI API key" required>
             <br>
             <button class="start-btn" onclick="startInterview()">Start Interview</button>
         </div>
+        <script>
+            // Render subjectInterview value in setup section
+            document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('subjectInterview').textContent = subjectInterview;
+            document.getElementById('questionCount').textContent = totalQuestions;
+            });
+        </script>
         
         <!-- Progress Section -->
         <div class="progress-section" id="progressSection">
@@ -411,13 +439,15 @@
     
     <script>
         // System message configuration
-        const totalQuestions = 3;
+        const totalQuestions = 4; //set no of questions here
+        const subjectInterview = "human resource management"; //set subject here International law
+
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('questionCount').textContent = totalQuestions;
         });
         const SYSTEM_MESSAGE = {
             role: "system",
-            content: `You are an interviewer. Your task is to assess the candidate's knowledge of Kubernetes and Docker. You will ask exactly ${totalQuestions} technical questions. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide any feedback, hints, or evaluation until all ${totalQuestions} questions have been answered. At the end of the interview, provide a short summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`
+            content: `You are an interviewer. Your task is to assess the candidate's knowledge of ${subjectInterview}. You will ask exactly ${totalQuestions} technical questions. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide any answers, feedback, hints, or evaluation until all ${totalQuestions} questions have been answered. At the end of the interview, provide a short summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`
         };
 
         // Interview state
@@ -568,7 +598,7 @@
             // Add initial prompt to start the interview
             conversationHistory.push({
                 role: 'user',
-                content: 'Please start the technical interview by asking your first question about Kubernetes and Docker.'
+                content: 'Please start the technical interview by asking your first question about ${subjectInterview}.'
             });
             
             const result = await callOpenAI();
@@ -719,14 +749,8 @@
                     role: 'user',
                     content: 'I would like to skip this question.'
                 });
-                
-                if (currentQuestion < totalQuestions) {
-                    currentQuestion++;
-                    updateProgress();
-                    getNextQuestion();
-                } else {
-                    finishInterview();
-                }
+
+                proceedToNextQuestion();
             }
         }
 
