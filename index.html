@@ -749,14 +749,8 @@
                     role: 'user',
                     content: 'I would like to skip this question.'
                 });
-                
-                if (currentQuestion < totalQuestions) {
-                    currentQuestion++;
-                    updateProgress();
-                    getNextQuestion();
-                } else {
-                    finishInterview();
-                }
+
+                proceedToNextQuestion();
             }
         }
 
