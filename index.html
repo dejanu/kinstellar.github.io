@@ -362,12 +362,7 @@
         <!-- Setup Section -->
         <div class="setup-section" id="setupSection">
             <h3>Interview Setup</h3>
-            <p>This is a technical interview focusing on <span id="subjectText"></span>. You'll be asked <span id="questionCount"></span> questions that <b>adapt</b> to your knowledge level.</p>
-
-            <p>
-            This is a technical interview focusing on <span id="subjectText"></span>. You'll be asked <span id="questionCount"></span> questions that <b>adapt</b> to your knowledge level.
-            </p>
-
+            <p>This is a technical interview focusing on Kubernetes and Docker. You'll be asked <span id="questionCount"></span> questions that <b>adapt</b> to your knowledge level.</p>
             <input type="password" id="apiKey" placeholder="Enter your OpenAI API key" required>
             <br>
             <button class="start-btn" onclick="startInterview()">Start Interview</button>
@@ -415,37 +410,15 @@
     </div>
     
     <script>
-        // Interview subject configuration
-        let INTERVIEW_SUBJECT = "Kubernetes and Docker"; // fallback
+        // System message configuration
         const totalQuestions = 3;
-        let SYSTEM_MESSAGE = {
-            role: "system",
-            content: ""
-        };
-
-        // Load subject from config.json
-        function loadSubject() {
-            fetch('config.json')
-                .then(res => res.json())
-                .then(cfg => {
-                    INTERVIEW_SUBJECT = cfg.interview_subject;
-                    document.getElementById('subjectText').textContent = INTERVIEW_SUBJECT;
-                    updateSystemMessage();
-                })
-                .catch(() => {
-                    document.getElementById('subjectText').textContent = INTERVIEW_SUBJECT;
-                    updateSystemMessage();
-                });
-        }
-
-        function updateSystemMessage() {
-            SYSTEM_MESSAGE.content = `You are an interviewer. Your task is to assess the candidate's knowledge of ${INTERVIEW_SUBJECT}. You will ask exactly ${totalQuestions} technical questions. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide any feedback, hints, or evaluation until all ${totalQuestions} questions have been answered. At the end of the interview, provide a short summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`;
-        }
-
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('questionCount').textContent = totalQuestions;
-            loadSubject();
         });
+        const SYSTEM_MESSAGE = {
+            role: "system",
+            content: `You are an interviewer. Your task is to assess the candidate's knowledge of Kubernetes and Docker. You will ask exactly ${totalQuestions} technical questions. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide any feedback, hints, or evaluation until all ${totalQuestions} questions have been answered. At the end of the interview, provide a short summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`
+        };
 
         // Interview state
         let currentQuestion = 0;
@@ -595,7 +568,7 @@
             // Add initial prompt to start the interview
             conversationHistory.push({
                 role: 'user',
-                content: `Please start the technical interview by asking your first question about ${INTERVIEW_SUBJECT}.`
+                content: 'Please start the technical interview by asking your first question about Kubernetes and Docker.'
             });
             
             const result = await callOpenAI();
