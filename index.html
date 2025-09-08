@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillPulse</title>
     <style>
         /* === DESIGN SYSTEM: TEAL-BASED HARMONIZED PALETTE === */
@@ -317,20 +318,36 @@
         /* Responsive design */
         @media (max-width: 768px) {
             body {
-                padding: 16px;
+                padding: 8px;
+                font-size: 16px;
             }
-            
             .container {
-                padding: 20px;
+                padding: 10px;
+                border-radius: 8px;
             }
-            
-            input[type="password"], input[type="text"] {
+            h1 {
+                font-size: 1.5rem;
+            }
+            .setup-section, .question-section, .answer-section, .progress-section, .final-summary {
+                padding: 12px;
+                border-radius: 8px;
+            }
+            input[type="password"], input[type="text"], textarea {
                 max-width: 100%;
+                font-size: 15px;
+                padding: 10px 12px;
             }
-            
             button {
                 width: 100%;
                 margin: 8px 0;
+                font-size: 15px;
+                padding: 12px 0;
+            }
+            img {
+                max-width: 100px;
+            }
+            .question-text {
+                font-size: 15px;
             }
         }
     </style>
