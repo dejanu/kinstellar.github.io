@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SkillPulse</title>
+    <style>
+        /* === DESIGN SYSTEM: TEAL-BASED HARMONIZED PALETTE === */
+        :root {
+            /* Primary Colors (Teal) */
+            --primary: #14b8a6;
+            --primary-dark: #0f766e;
+            --primary-light: #5eead4;
+            --primary-bg: #f0fdfa;
+            
+            /* Secondary Colors */
+            --secondary: #3b82f6;
+            --secondary-dark: #2563eb;
+            --secondary-light: #93c5fd;
+            --secondary-bg: #eff6ff;
+            
+            /* Accent Colors */
+            --accent: #8b5cf6;
+            --accent-dark: #7c3aed;
+            --accent-light: #c4b5fd;
+            --accent-bg: #f5f3ff;
+            
+            /* Neutral Colors */
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --text-primary: #334155;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            
+            /* Status Colors */
+            --success: #10b981;
+            --success-bg: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
+            --error: #ef4444;
+            --error-bg: #fef2f2;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--background) 0%, var(--primary-bg) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .container {
+            background: var(--surface);
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border-light);
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-size: 2.25rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        .setup-section {
+            margin-bottom: 32px;
+            padding: 24px;
+            background: var(--primary-bg);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            border: 1px solid var(--primary-light);
+        }
+        
+        .setup-section h3 {
+            color: var(--primary-dark);
+            margin-top: 0;
+        }
+        
+        .question-section {
+            margin: 24px 0;
+            padding: 24px;
+            background: var(--secondary-bg);
+            border-radius: 12px;
+            border-left: 4px solid var(--secondary);
+            border: 1px solid var(--secondary-light);
+            display: none;
+        }
+        
+        .question-section h3 {
+            color: var(--secondary-dark);
+            margin-top: 0;
+        }
+        
+        .answer-section {
+            margin: 24px 0;
+            padding: 24px;
+            background: var(--accent-bg);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+            border: 1px solid var(--accent-light);
+            display: none;
+        }
+        
+        .answer-section h3 {
+            color: var(--accent-dark);
+            margin-top: 0;
+        }
+        
+        .progress-section {
+            margin: 24px 0;
+            padding: 20px;
+            background: var(--success-bg);
+            border-radius: 12px;
+            text-align: center;
+            display: none;
+            border: 1px solid var(--success);
+        }
+        
+        .progress-section h4 {
+            color: var(--success);
+            margin-top: 0;
+        }
+        
+        .question-text {
+            font-size: 16px;
+            line-height: 1.7;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        input[type="password"], input[type="text"] {
+            width: 100%;
+            max-width: 400px;
+            padding: 14px 16px;
+            margin: 12px 0;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: var(--surface);
+            color: var(--text-primary);
+        }
+        
+        input[type="password"]:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 14px 16px;
+            margin: 12px 0;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            min-height: 120px;
+            resize: vertical;
+            transition: all 0.2s ease;
+            background: var(--surface);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+        
+        button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 12px 8px 12px 0;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.15);
+        }
+        
+        button:hover {
+            background: var(--secondary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.25);
+        }
+        
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.15);
+        }
+        
+        button:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .start-btn {
+            background: var(--primary);
+            box-shadow: 0 2px 4px rgba(20, 184, 166, 0.15);
+        }
+        
+        .start-btn:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 4px 8px rgba(20, 184, 166, 0.25);
+        }
+        
+        .skip-btn {
+            background: var(--text-secondary);
+            box-shadow: 0 2px 4px rgba(100, 116, 139, 0.15);
+        }
+        
+        .skip-btn:hover {
+            background: var(--text-primary);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: var(--border-light);
+            border-radius: 6px;
+            margin: 16px 0;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success) 0%, var(--primary) 100%);
+            border-radius: 6px;
+            transition: width 0.4s ease;
+            box-shadow: 0 1px 2px rgba(16, 185, 129, 0.2);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .final-summary {
+            margin-top: 32px;
+            padding: 24px;
+            background: var(--primary-bg);
+            border-radius: 12px;
+            border: 2px solid var(--primary);
+            display: none;
+            box-shadow: 0 4px 6px rgba(20, 184, 166, 0.1);
+        }
+        
+        .final-summary h3 {
+            color: var(--primary-dark);
+            margin-top: 0;
+        }
+        
+        .timer-section {
+            text-align: center;
+            margin: 20px 0;
+            padding: 16px;
+            background: var(--error-bg);
+            border-radius: 10px;
+            border: 2px solid var(--error);
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);
+        }
+        
+        .timer-display {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--error);
+            margin: 8px 0;
+            text-shadow: 0 1px 2px rgba(239, 68, 68, 0.1);
+        }
+        
+        .timer-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 4px;
+            margin: 12px 0;
+            overflow: hidden;
+        }
+        
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--error) 0%, var(--warning) 100%);
+            border-radius: 4px;
+            transition: width 0.1s linear;
+            box-shadow: 0 1px 2px rgba(239, 68, 68, 0.2);
+        }
+        
+        /* Animations and micro-interactions */
+        .question-section, .answer-section, .progress-section, .final-summary {
+            animation: fadeInUp 0.3s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            input[type="password"], input[type="text"] {
+                max-width: 100%;
+            }
+            
+            button {
+                width: 100%;
+                margin: 8px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SkillPulse</h1>
+        <div style="text-align:center; margin-bottom:16px;">
+            <img src="skillpulse.gif" alt="SkillPulse Logo" style="max-width:160px; width:100%; border-radius:12px;">
+        </div>
+        <div style="text-align:center; margin-bottom:24px;">
+            <span id="typingText" style="font-size:1.2rem; color:var(--accent-dark); font-weight:600; letter-spacing:1px;"></span>
+        </div>
+        <script>
+            // Simple typing animation for "your AI interview assistant"
+            const typingText = "Your own AI interview assistant";
+            const typingElem = document.getElementById('typingText');
+            let idx = 0;
+            function typeWriter() {
+            if (idx <= typingText.length) {
+                typingElem.textContent = typingText.slice(0, idx) + (idx < typingText.length ? "|" : "");
+                idx++;
+                setTimeout(typeWriter, 70);
+            }
+            }
+            typeWriter();
+        </script>
+        
+        <!-- Setup Section -->
+        <div class="setup-section" id="setupSection">
+            <h3>Interview Setup</h3>
+            <p>This is a technical interview focusing on Kubernetes and Docker. You'll be asked <span id="questionCount"></span> questions that <b>adapt</b> to your knowledge level.</p>
+            <input type="password" id="apiKey" placeholder="Enter your OpenAI API key" required>
+            <br>
+            <button class="start-btn" onclick="startInterview()">Start Interview</button>
+        </div>
+        
+        <!-- Progress Section -->
+        <div class="progress-section" id="progressSection">
+            <h4>Interview Progress</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <p id="progressText">Question 0 of 3</p>
+        </div>
+        
+        <!-- Question Section -->
+        <div class="question-section" id="questionSection">
+            <h3>Interview Question</h3>
+            <div class="question-text" id="questionText">Loading question...</div>
+            
+            <!-- Timer Section -->
+            <div class="timer-section" id="timerSection" style="display: none;">
+                <div>Time Remaining: <span class="timer-display" id="timerDisplay">30</span> seconds</div>
+                <div class="timer-bar">
+                    <div class="timer-fill" id="timerFill" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Answer Section -->
+        <div class="answer-section" id="answerSection">
+            <h3>Your Answer</h3>
+            <textarea id="answerText" placeholder="Type your answer here..."></textarea>
+            <br>
+            <button onclick="submitAnswer()">Submit Answer</button>
+            <button onclick="skipQuestion()" class="skip-btn">Skip Question</button>
+        </div>
+        
+        <!-- Final Summary Section -->
+        <div class="final-summary" id="finalSummary">
+            <h3>Interview Complete - Assessment Summary</h3>
+            <div id="summaryText"></div>
+            <br>
+            <button onclick="resetInterview()" class="start-btn">Start New Interview</button>
+        </div>
+    </div>
+    
+    <script>
+        // System message configuration
+        const totalQuestions = 3;
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('questionCount').textContent = totalQuestions;
+        });
+        const SYSTEM_MESSAGE = {
+            role: "system",
+            content: `You are an interviewer. Your task is to assess the candidate's knowledge of Kubernetes and Docker. You will ask exactly ${totalQuestions} technical questions. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide any feedback, hints, or evaluation until all ${totalQuestions} questions have been answered. At the end of the interview, provide a short summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`
+        };
+
+        // Interview state
+        let currentQuestion = 0;
+        let apiKey = '';
+        let conversationHistory = [];
+        
+        // Timer state
+        let questionTimer = null;
+        let timeRemaining = 30;
+        const QUESTION_TIME_LIMIT = 30; // seconds
+
+
+        function startInterview() {
+            apiKey = document.getElementById('apiKey').value.trim();
+            
+            if (!apiKey) {
+                alert('Please enter your OpenAI API key');
+                return;
+            }
+            
+            // Basic API key format validation
+            if (!apiKey.startsWith('sk-') || apiKey.length < 20) {
+                alert('Invalid API key format. OpenAI API keys start with "sk-" and are longer than 20 characters.');
+                document.getElementById('apiKey').focus();
+                return;
+            }
+            
+            // Show loading state
+            const startBtn = document.querySelector('.start-btn');
+            const originalText = startBtn.textContent;
+            startBtn.textContent = 'Validating API Key...';
+            startBtn.disabled = true;
+            
+            // Test API key with a simple request
+            testAPIKey().then(isValid => {
+                startBtn.textContent = originalText;
+                startBtn.disabled = false;
+                
+                if (isValid) {
+                    // API key is valid, proceed with interview
+                    proceedWithInterview();
+                } else {
+                    alert('Invalid API key. Please check your OpenAI API key and try again.');
+                    document.getElementById('apiKey').focus();
+                }
+            });
+        }
+
+        async function testAPIKey() {
+            try {
+                const response = await fetch('https://api.openai.com/v1/models', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`
+                    }
+                });
+                
+                return response.status === 200;
+            } catch (error) {
+                console.error('API key test failed:', error);
+                return false;
+            }
+        }
+
+        function proceedWithInterview() {
+            // Hide setup section and show interview sections
+            document.getElementById('setupSection').style.display = 'none';
+            document.getElementById('progressSection').style.display = 'block';
+            document.getElementById('questionSection').style.display = 'block';
+            document.getElementById('answerSection').style.display = 'block';
+            
+            // Initialize conversation history with system message
+            conversationHistory = [SYSTEM_MESSAGE];
+            
+            // Start the interview
+            currentQuestion = 1;
+            updateProgress();
+            getFirstQuestion();
+        }
+
+        function updateProgress() {
+            const progressPercent = (currentQuestion / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+            document.getElementById('progressText').textContent = `Question ${currentQuestion} of ${totalQuestions}`;
+        }
+
+        function startQuestionTimer() {
+            // Reset timer state
+            timeRemaining = QUESTION_TIME_LIMIT;
+            document.getElementById('timerDisplay').textContent = timeRemaining;
+            document.getElementById('timerFill').style.width = '100%';
+            document.getElementById('timerSection').style.display = 'block';
+            
+            // Clear any existing timer
+            if (questionTimer) {
+                clearInterval(questionTimer);
+            }
+            
+            // Start countdown
+            questionTimer = setInterval(() => {
+                timeRemaining--;
+                document.getElementById('timerDisplay').textContent = timeRemaining;
+                
+                // Update visual timer bar
+                const percentage = (timeRemaining / QUESTION_TIME_LIMIT) * 100;
+                document.getElementById('timerFill').style.width = percentage + '%';
+                
+                // Time's up - auto-submit
+                if (timeRemaining <= 0) {
+                    clearInterval(questionTimer);
+                    autoSubmitAnswer();
+                }
+            }, 1000);
+        }
+
+        function stopQuestionTimer() {
+            if (questionTimer) {
+                clearInterval(questionTimer);
+                questionTimer = null;
+            }
+            document.getElementById('timerSection').style.display = 'none';
+        }
+
+        function autoSubmitAnswer() {
+            const answerText = document.getElementById('answerText').value.trim();
+            const finalAnswer = answerText || "No answer provided (time expired)";
+            
+            // Add user's answer (or lack thereof) to conversation history
+            conversationHistory.push({
+                role: 'user',
+                content: finalAnswer
+            });
+            
+            // Clear the answer field
+            document.getElementById('answerText').value = '';
+            
+            // Stop the timer
+            stopQuestionTimer();
+            
+            // Proceed to next question or finish interview
+            proceedToNextQuestion();
+        }
+
+        async function getFirstQuestion() {
+            document.getElementById('questionText').textContent = 'Loading first question...';
+            
+            // Add initial prompt to start the interview
+            conversationHistory.push({
+                role: 'user',
+                content: 'Please start the technical interview by asking your first question about Kubernetes and Docker.'
+            });
+            
+            const result = await callOpenAI();
+            
+            if (result.success) {
+                document.getElementById('questionText').textContent = result.response;
+                conversationHistory.push({
+                    role: 'assistant',
+                    content: result.response
+                });
+                
+                // Start the timer for this question
+                startQuestionTimer();
+            } else {
+                // Handle different types of errors
+                if (result.isAuthError) {
+                    // API key error - return to setup
+                    handleAPIKeyError(result.error);
+                } else {
+                    // Other errors - show in question area but allow retry
+                    document.getElementById('questionText').textContent = result.error;
+                    setTimeout(() => {
+                        if (confirm('Would you like to retry loading the question?')) {
+                            getFirstQuestion();
+                        } else {
+                            handleAPIKeyError('Interview cancelled due to error.');
+                        }
+                    }, 2000);
+                }
+            }
+        }
+
+        function handleAPIKeyError(errorMessage) {
+            // Stop any running timer
+            stopQuestionTimer();
+            
+            // Show error message
+            alert(errorMessage + '\n\nReturning to setup screen to enter a new API key.');
+            
+            // Reset to setup screen but keep question/answer sections visible for context
+            document.getElementById('setupSection').style.display = 'block';
+            document.getElementById('questionText').textContent = 'Please enter a valid API key and restart the interview.';
+            
+            // Clear API key field for new input
+            document.getElementById('apiKey').value = '';
+            document.getElementById('apiKey').focus();
+        }
+
+        async function proceedToNextQuestion() {
+            if (currentQuestion < totalQuestions) {
+                // Get next question
+                currentQuestion++;
+                updateProgress();
+                document.getElementById('questionText').textContent = 'Loading next question...';
+                
+                const result = await callOpenAI();
+                
+                if (result.success) {
+                    document.getElementById('questionText').textContent = result.response;
+                    conversationHistory.push({
+                        role: 'assistant',
+                        content: result.response
+                    });
+                    
+                    // Start timer for next question
+                    startQuestionTimer();
+                } else {
+                    // Handle errors during question progression
+                    if (result.isAuthError) {
+                        handleAPIKeyError(result.error);
+                    } else {
+                        document.getElementById('questionText').textContent = result.error;
+                        setTimeout(() => {
+                            if (confirm('Error loading next question. Would you like to retry?')) {
+                                // Retry the same question
+                                currentQuestion--;
+                                updateProgress();
+                                proceedToNextQuestion();
+                            } else {
+                                finishInterview();
+                            }
+                        }, 2000);
+                    }
+                }
+            } else {
+                // Interview complete, get final summary
+                finishInterview();
+            }
+        }
+
+        async function submitAnswer() {
+            const answerText = document.getElementById('answerText').value.trim();
+            
+            if (!answerText) {
+                alert('Please provide an answer before submitting.');
+                return;
+            }
+            
+            // Stop the timer
+            stopQuestionTimer();
+            
+            // Add user's answer to conversation history
+            conversationHistory.push({
+                role: 'user',
+                content: answerText
+            });
+            
+            // Clear the answer field
+            document.getElementById('answerText').value = '';
+            
+            // Proceed to next question or finish interview
+            proceedToNextQuestion();
+        }
+
+        async function finishInterview() {
+            // Stop any running timer
+            stopQuestionTimer();
+            
+            // Hide question and answer sections
+            document.getElementById('questionSection').style.display = 'none';
+            document.getElementById('answerSection').style.display = 'none';
+            
+            // Update progress to 100%
+            document.getElementById('progressFill').style.width = '100%';
+            document.getElementById('progressText').textContent = 'Interview Complete';
+            
+            // Request final summary
+            conversationHistory.push({
+                role: 'user',
+                content: 'All 3 questions have been answered. Please provide your final assessment summary.'
+            });
+            
+            document.getElementById('finalSummary').style.display = 'block';
+            document.getElementById('summaryText').textContent = 'Generating assessment summary...';
+            
+            const result = await callOpenAI();
+            
+            if (result.success) {
+                document.getElementById('summaryText').textContent = result.response;
+            } else {
+                document.getElementById('summaryText').textContent = 'Error generating summary: ' + result.error;
+            }
+        }
+
+        function skipQuestion() {
+            if (confirm('Are you sure you want to skip this question?')) {
+                conversationHistory.push({
+                    role: 'user',
+                    content: 'I would like to skip this question.'
+                });
+                
+                if (currentQuestion < totalQuestions) {
+                    currentQuestion++;
+                    updateProgress();
+                    getNextQuestion();
+                } else {
+                    finishInterview();
+                }
+            }
+        }
+
+        async function callOpenAI() {
+            try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-3.5-turbo',
+                        messages: conversationHistory,
+                        max_tokens: 500,
+                        temperature: 0.7
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error('API Error:', data.error.message);
+                    
+                    // Handle specific error types
+                    if (response.status === 401) {
+                        return { 
+                            success: false, 
+                            error: "Invalid API key. Please check your OpenAI API key and try again.",
+                            isAuthError: true
+                        };
+                    } else if (response.status === 429) {
+                        return { 
+                            success: false, 
+                            error: "Rate limit exceeded or insufficient credits. Please check your OpenAI account.",
+                            isRateLimit: true
+                        };
+                    } else {
+                        return { 
+                            success: false, 
+                            error: `API Error: ${data.error.message}`
+                        };
+                    }
+                } else {
+                    return { success: true, response: data.choices[0].message.content };
+                }
+            } catch (error) {
+                console.error('Network Error:', error.message);
+                return { 
+                    success: false, 
+                    error: `Network error: ${error.message}. Please check your internet connection.`
+                };
+            }
+        }
+
+        function resetInterview() {
+            // Stop any running timer
+            stopQuestionTimer();
+            
+            // Reset all state variables
+            currentQuestion = 0;
+            apiKey = '';
+            conversationHistory = [];
+            timeRemaining = QUESTION_TIME_LIMIT;
+            
+            // Clear all input fields
+            document.getElementById('apiKey').value = '';
+            document.getElementById('answerText').value = '';
+            document.getElementById('questionText').textContent = 'Loading question...';
+            document.getElementById('summaryText').textContent = '';
+            
+            // Reset progress
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressText').textContent = 'Question 0 of 3';
+            
+            // Reset timer display
+            document.getElementById('timerDisplay').textContent = QUESTION_TIME_LIMIT;
+            document.getElementById('timerFill').style.width = '100%';
+            
+            // Show setup section and hide all others
+            document.getElementById('setupSection').style.display = 'block';
+            document.getElementById('progressSection').style.display = 'none';
+            document.getElementById('questionSection').style.display = 'none';
+            document.getElementById('answerSection').style.display = 'none';
+            document.getElementById('finalSummary').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
