@@ -335,7 +335,9 @@
             input[type="password"], input[type="text"], textarea {
                 max-width: 100%;
                 font-size: 15px;
-                padding: 10px 12px;
+                padding: 12px; /* Adjusted padding */
+                margin: 8px 0; /* Ensure spacing between fields */
+                box-sizing: border-box; /* Prevent overflow */
             }
             button {
                 width: 100%;
@@ -439,8 +441,8 @@
     
     <script>
         // System message configuration
-        const totalQuestions = 4; //set no of questions here
-        const subjectInterview = "3D software Rendering"; //set subject here
+        const totalQuestions = 2; //set no of questions here
+        const subjectInterview = "human resource management"; //set subject here
 
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('questionCount').textContent = totalQuestions;
