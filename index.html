@@ -381,7 +381,7 @@
             <h3>Interview Setup</h3>
             <p>
             This is a technical interview concerning 
-            <span id="subjectInterview"></span>, 
+            <span id="subjectInterview" style="font-weight: bold;"></span>, 
             You'll be asked <span id="questionCount"></span> questions that <b>adapt</b> to your knowledge level.
             </p>
             <input type="password" id="apiKey" placeholder="Enter your OpenAI API key" required>
@@ -440,7 +440,7 @@
     <script>
         // System message configuration
         const totalQuestions = 4; //set no of questions here
-        const subjectInterview = "Microsoft Excel"; //set subject here International law
+        const subjectInterview = "SAP S/4 HANA and SQL"; //set subject here
 
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('questionCount').textContent = totalQuestions;
