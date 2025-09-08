@@ -362,11 +362,22 @@
         <!-- Setup Section -->
         <div class="setup-section" id="setupSection">
             <h3>Interview Setup</h3>
-            <p>This is a technical interview focusing on Kubernetes and Docker. You'll be asked <span id="questionCount"></span> questions that <b>adapt</b> to your knowledge level.</p>
+            <p>
+            This is a technical interview concerning 
+            <span id="subjectInterview"></span>, 
+            You'll be asked <span id="questionCount"></span> questions that <b>adapt</b> to your knowledge level.
+            </p>
             <input type="password" id="apiKey" placeholder="Enter your OpenAI API key" required>
             <br>
             <button class="start-btn" onclick="startInterview()">Start Interview</button>
         </div>
+        <script>
+            // Render subjectInterview value in setup section
+            document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('subjectInterview').textContent = subjectInterview;
+            document.getElementById('questionCount').textContent = totalQuestions;
+            });
+        </script>
         
         <!-- Progress Section -->
         <div class="progress-section" id="progressSection">
@@ -411,13 +422,15 @@
     
     <script>
         // System message configuration
-        const totalQuestions = 3;
+        const totalQuestions = 4; //set no of questions here
+        const subjectInterview = "International law"; //set subject here International law
+
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('questionCount').textContent = totalQuestions;
         });
         const SYSTEM_MESSAGE = {
             role: "system",
-            content: `You are an interviewer. Your task is to assess the candidate's knowledge of Kubernetes and Docker. You will ask exactly ${totalQuestions} technical questions. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide any feedback, hints, or evaluation until all ${totalQuestions} questions have been answered. At the end of the interview, provide a short summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`
+            content: `You are an interviewer. Your task is to assess the candidate's knowledge of ${subjectInterview}. You will ask exactly ${totalQuestions} technical questions. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide any feedback, hints, or evaluation until all ${totalQuestions} questions have been answered. At the end of the interview, provide a short summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`
         };
 
         // Interview state
@@ -568,7 +581,7 @@
             // Add initial prompt to start the interview
             conversationHistory.push({
                 role: 'user',
-                content: 'Please start the technical interview by asking your first question about Kubernetes and Docker.'
+                content: 'Please start the technical interview by asking your first question about ${subjectInterview}.'
             });
             
             const result = await callOpenAI();
