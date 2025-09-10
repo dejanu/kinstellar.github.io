@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TechHeatmap</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        /* === DESIGN SYSTEM: TEAL-BASED HARMONIZED PALETTE === */
+        :root {
+            /* Primary Colors (Teal) */
+            --primary: #14b8a6;
+            --primary-dark: #0f766e;
+            --primary-light: #5eead4;
+            --primary-bg: #f0fdfa;
+            /* Secondary Colors */
+            --secondary: #3b82f6;
+            --secondary-dark: #2563eb;
+            --secondary-light: #93c5fd;
+            --secondary-bg: #eff6ff;
+            /* Accent Colors */
+            --accent: #8b5cf6;
+            --accent-dark: #7c3aed;
+            --accent-light: #c4b5fd;
+            --accent-bg: #f5f3ff;
+            /* Neutral Colors */
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --text-primary: #334155;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            /* Status Colors */
+            --success: #10b981;
+            --success-bg: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
+            --error: #ef4444;
+            --error-bg: #fef2f2;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--background) 0%, var(--primary-bg) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            background: var(--surface);
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border-light);
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-size: 2.25rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        #map {
+            height: 600px;
+            width: 100%;
+            margin-top: 24px;
+            border-radius: 16px;
+            border: 1px solid var(--primary-light);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            body {
+                padding: 8px;
+                font-size: 16px;
+            }
+            .container {
+                padding: 10px;
+                border-radius: 8px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            #map {
+                height: 300px;
+                border-radius: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- form to read the PAT used in github_api.js script
+    <form id="pat-form">
+        <label for="pat-token">Enter your GitHub Personal Access Token:</label>
+        <input type="text" id="pat-token" name="pat-token" required>
+        <input type="submit" value="Submit">
+    </form> -->
+    <h1>GitHub Accounts per Country</h1>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+    <script src="scripts/heatmap.js"></script>
+    <script src="scripts/github_api.js"></script>
+</body>
+</html>
