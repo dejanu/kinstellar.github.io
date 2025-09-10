@@ -451,14 +451,15 @@
     </div>
     
     <script>
-        // System message configuration
+        // System set configuration
+        const subjectInterview = "human resource management";
         let totalQuestions = parseInt(document.getElementById('questionsDropdown').value, 10); // initialize from dropdown
 
         document.getElementById('questionsDropdown').addEventListener('change', function(e) {
             totalQuestions = parseInt(e.target.value, 10);
             document.getElementById('questionCount').textContent = totalQuestions;
         });
-        const subjectInterview = "C# and .NET"; //set subject here
+        
 
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('questionCount').textContent = totalQuestions;
