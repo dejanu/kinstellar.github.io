@@ -384,17 +384,28 @@
             <p>
             This is a technical interview concerning 
             <span id="subjectInterview" style="font-weight: bold;"></span>, 
-            You'll be asked <span id="questionCount"></span> questions that <b>adapt</b> to your knowledge level.
+            You'll be asked 
+            <select id="questionsDropdown">
+                <option value="2">2</option>
+                <option value="4">4</option>
+                <option value="6">6</option>
+            </select>
+            questions <b>adapt</b> to your knowledge level.
             </p>
             <input type="password" id="apiKey" placeholder="Enter your OpenAI API key" required>
             <br>
             <button class="start-btn" onclick="startInterview()">Start Interview</button>
         </div>
         <script>
-            // Render subjectInterview value in setup section
+            // Render subjectInterview value in setup section and update totalQuestions on dropdown change
             document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('subjectInterview').textContent = subjectInterview;
-            document.getElementById('questionCount').textContent = totalQuestions;
+                document.getElementById('subjectInterview').textContent = subjectInterview;
+                document.getElementById('questionCount').textContent = totalQuestions;
+                // Add event listener for dropdown
+                document.getElementById('questionsDropdown').addEventListener('change', function(e) {
+                    totalQuestions = parseInt(e.target.value, 10);
+                    document.getElementById('questionCount').textContent = totalQuestions;
+                });
             });
         </script>
         
@@ -441,7 +452,12 @@
     
     <script>
         // System message configuration
-        const totalQuestions = 4; //set no of questions here
+        let totalQuestions = parseInt(document.getElementById('questionsDropdown').value, 10); // initialize from dropdown
+
+        document.getElementById('questionsDropdown').addEventListener('change', function(e) {
+            totalQuestions = parseInt(e.target.value, 10);
+            document.getElementById('questionCount').textContent = totalQuestions;
+        });
         const subjectInterview = "human resource management"; //set subject here
 
         document.addEventListener('DOMContentLoaded', function() {
