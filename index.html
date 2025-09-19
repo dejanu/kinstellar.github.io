@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>talentscrn</title>
+    <title>kstHR</title>
     <style>
-        /* === DESIGN SYSTEM: TEAL-BASED HARMONIZED PALETTE === */
+        /* === DESIGN SYSTEM: ORANGE-BASED HARMONIZED PALETTE === */
         :root {
-            /* Primary Colors (Teal) */
-            --primary: #14b8a6;
-            --primary-dark: #0f766e;
-            --primary-light: #5eead4;
-            --primary-bg: #f0fdfa;
+            /* Primary Colors (Orange) */
+            --primary: #cb6015;
+            --primary-dark: #a14b11;
+            --primary-light: #e07f3a;
+            --primary-bg: #fff4ec;
             
             /* Secondary Colors */
             --secondary: #3b82f6;
@@ -41,6 +41,9 @@
             --warning-bg: #fffbeb;
             --error: #ef4444;
             --error-bg: #fef2f2;
+
+            /* Typing Text Color */
+            --typing-text-color: #722257;
         }
 
         body {
@@ -152,7 +155,7 @@
         input[type="password"]:focus, input[type="text"]:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+            box-shadow: 0 0 0 3px rgba(203, 96, 21, 0.1);
         }
         
         textarea {
@@ -210,12 +213,12 @@
         
         .start-btn {
             background: var(--primary);
-            box-shadow: 0 2px 4px rgba(20, 184, 166, 0.15);
+            box-shadow: 0 2px 4px rgba(203, 96, 21, 0.15);
         }
         
         .start-btn:hover {
             background: var(--primary-dark);
-            box-shadow: 0 4px 8px rgba(20, 184, 166, 0.25);
+            box-shadow: 0 4px 8px rgba(203, 96, 21, 0.25);
         }
         
         .skip-btn {
@@ -256,7 +259,7 @@
             border-radius: 12px;
             border: 2px solid var(--primary);
             display: none;
-            box-shadow: 0 4px 6px rgba(20, 184, 166, 0.1);
+            box-shadow: 0 4px 6px rgba(203, 96, 21, 0.1);
         }
         
         .final-summary h3 {
@@ -356,12 +359,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>talentscrn</h1>
+        <h1>kstHR</h1>
         <div style="text-align:center; margin-bottom:16px;">
             <img src="skillpulse.gif" alt="talentscrn Logo" style="max-width:160px; width:100%; border-radius:12px;">
         </div>
         <div style="text-align:center; margin-bottom:24px;">
-            <span id="typingText" style="font-size:1.2rem; color:var(--accent-dark); font-weight:600; letter-spacing:1px;"></span>
+            <span id="typingText" style="font-size:1.2rem; color:var(--typing-text-color); font-weight:600; letter-spacing:1px;"></span>
         </div>
         <script>
             // Simple typing animation for "your AI interview assistant"
