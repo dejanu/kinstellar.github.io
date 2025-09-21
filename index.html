@@ -385,15 +385,17 @@
         <div class="setup-section" id="setupSection">
             <h3>Interview Setup</h3>
             <p>
-            This is a technical interview concerning 
-            <span id="subjectInterview" style="font-weight: bold;"></span>, 
-            You'll be asked 
-            <select id="questionsDropdown">
-                <option value="2">2</option>
-                <option value="4">4</option>
-                <option value="6">6</option>
-            </select>
-            questions <b>adapt</b> to your knowledge level.
+                This is a technical interview concerning 
+                <select id="subjectDropdown">
+                    <!-- Options will be dynamically populated -->
+                </select>, 
+                You'll be asked 
+                <select id="questionsDropdown">
+                    <option value="2">2</option>
+                    <option value="4">4</option>
+                    <option value="6">6</option>
+                </select>
+                questions <b>adapt</b> to your knowledge level.
             </p>
             <input type="password" id="apiKey" placeholder="Enter your OpenAI API key" required>
             <br>
@@ -403,16 +405,52 @@
             </div>
         </div>
         <script>
-            // Render subjectInterview value in setup section and update totalQuestions on dropdown change
-            document.addEventListener('DOMContentLoaded', function() {
-                document.getElementById('subjectInterview').textContent = subjectInterview;
-                document.getElementById('questionCount').textContent = totalQuestions;
-                // Add event listener for dropdown
-                document.getElementById('questionsDropdown').addEventListener('change', function(e) {
-                    totalQuestions = parseInt(e.target.value, 10);
-                    document.getElementById('questionCount').textContent = totalQuestions;
-                });
+            // Populate subjectDropdown with subjectInterview array values
+            const subjectInterviewOptions = ["Manager", "Specialist", "Business Partner"];
+            const subjectDropdown = document.getElementById('subjectDropdown');
+            subjectInterviewOptions.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                subjectDropdown.appendChild(option);
             });
+
+            let selectedSubject = subjectDropdown.value; // Default selected subject
+            subjectDropdown.addEventListener('change', function () {
+                selectedSubject = this.value;
+            });
+
+            // Sanitize user inputs to prevent prompt injection
+            function sanitizeInput(input) {
+                const div = document.createElement('div');
+                div.textContent = input;
+                return div.innerHTML;
+            }
+
+            function startInterview() {
+                apiKey = document.getElementById('apiKey').value.trim();
+                
+                if (!apiKey) {
+                    alert('Please enter your OpenAI API key');
+                    return;
+                }
+                
+                // Basic API key format validation
+                if (!apiKey.startsWith('sk-') || apiKey.length < 20) {
+                    alert('Invalid API key format. OpenAI API keys start with "sk-" and are longer than 20 characters.');
+                    document.getElementById('apiKey').focus();
+                    return;
+                }
+                
+                // Sanitize selected subject
+                const sanitizedSubject = sanitizeInput(selectedSubject);
+
+                // Update SYSTEM_MESSAGE with the sanitized subject
+                SYSTEM_MESSAGE.content = `You are an interviewer. Your task is to assess the candidate's knowledge of Human Resource ${sanitizedSubject}. You will ask exactly ${totalQuestions} ${sanitizedSubject} technical questions. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide any answers, feedback, hints, or evaluation until all ${totalQuestions} questions have been answered. At the end of the interview, provide a short, objective summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`;
+
+                // Proceed with the interview
+                proceedWithInterview();
+            }
         </script>
         
         <!-- Progress Section -->
@@ -458,7 +496,8 @@
     
     <script>
         // System set configuration
-        const subjectInterview = "human resource management";
+        // const subjectInterview = "human resource management";
+        const subjectInterview = ["manager", "specialist", "business partner"];
         let totalQuestions = parseInt(document.getElementById('questionsDropdown').value, 10); // initialize from dropdown
 
         document.getElementById('questionsDropdown').addEventListener('change', function(e) {
@@ -472,7 +511,7 @@
         });
         const SYSTEM_MESSAGE = {
             role: "system",
-            content: `You are an interviewer. Your task is to assess the candidate's knowledge of ${subjectInterview}. You will ask exactly ${totalQuestions} ${subjectInterview} technical questions. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide any answers, feedback, hints, or evaluation until all ${totalQuestions} questions have been answered. At the end of the interview, provide a short, obiective summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`
+            content: `You are an interviewer. Your role is to assess the candidate's knowledge of ${subjectInterview}. You must ask exactly ${totalQuestions} technical questions about ${subjectInterview}. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide answers, feedback, hints, or evaluations until all ${totalQuestions} questions are completed. At the end of the interview, provide a short, objective summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`
         };
 
         // Interview state
