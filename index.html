@@ -406,7 +406,7 @@
         </div>
         <script>
             // Populate subjectDropdown with subjectInterview array values
-            const subjectInterviewOptions = ["Manager", "Specialist", "Business Partner"];
+            const subjectInterviewOptions = ["Human Resource Manager", "Human Resource Specialist", "Human Resource Recruiter"];
             const subjectDropdown = document.getElementById('subjectDropdown');
             subjectInterviewOptions.forEach(subject => {
                 const option = document.createElement('option');
@@ -446,7 +446,7 @@
                 const sanitizedSubject = sanitizeInput(selectedSubject);
 
                 // Update SYSTEM_MESSAGE with the sanitized subject
-                SYSTEM_MESSAGE.content = `You are an interviewer. Your task is to assess the candidate's knowledge of Human Resource ${sanitizedSubject}. You will ask exactly ${totalQuestions} ${sanitizedSubject} technical questions. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide any answers, feedback, hints, or evaluation until all ${totalQuestions} questions have been answered. At the end of the interview, provide a short, objective summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`;
+                SYSTEM_MESSAGE.content = `You are an interviewer. Your task is to assess the candidate's knowledge of ${sanitizedSubject}. You will ask exactly ${totalQuestions} ${sanitizedSubject} technical questions. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide any answers, feedback, hints, or evaluation until all ${totalQuestions} questions have been answered. At the end of the interview, provide a short, objective summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`;
 
                 // Proceed with the interview
                 proceedWithInterview();
