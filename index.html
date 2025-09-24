@@ -392,8 +392,8 @@
                 You'll be asked 
                 <select id="questionsDropdown">
                     <option value="2">2</option>
+                    <option value="3">3</option>
                     <option value="4">4</option>
-                    <option value="6">6</option>
                 </select>
                 questions <b>adapted</b> to your knowledge level.
             </p>
@@ -747,8 +747,8 @@
                         }, 2000);
                     }
                 }
-            } else {
-                // Interview complete, get final summary
+            } else if (currentQuestion === totalQuestions) {
+                // Ensure the interview completes only after all questions are answered
                 finishInterview();
             }
         }
@@ -792,19 +792,19 @@
             // Request final summary
             conversationHistory.push({
                 role: 'user',
-                content: 'All 3 questions have been answered. Please provide your final assessment summary.'
+                content: `All ${totalQuestions} questions have been answered. Please provide your final assessment summary.`
             });
             
             document.getElementById('finalSummary').style.display = 'block';
             document.getElementById('summaryText').textContent = 'Generating assessment summary...';
             
-            const result = await callOpenAI();
-            
-            if (result.success) {
-                document.getElementById('summaryText').textContent = result.response;
-            } else {
-                document.getElementById('summaryText').textContent = 'Error generating summary: ' + result.error;
-            }
+            callOpenAI().then(result => {
+                if (result.success) {
+                    document.getElementById('summaryText').textContent = result.response;
+                } else {
+                    document.getElementById('summaryText').textContent = 'Error generating summary: ' + result.error;
+                }
+            });
         }
 
         function skipQuestion() {
@@ -827,7 +827,7 @@
                         'Authorization': `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
-                        model: 'gpt-3.5-turbo',
+                        model: 'gpt-3.5-turbo', // model selection
                         messages: conversationHistory,
                         max_tokens: 500,
                         temperature: 0.7
