@@ -428,6 +428,7 @@
             }
 
             function startInterview() {
+
                 apiKey = document.getElementById('apiKey').value.trim();
                 
                 if (!apiKey) {
@@ -446,7 +447,7 @@
                 const sanitizedSubject = sanitizeInput(selectedSubject);
 
                 // Update SYSTEM_MESSAGE with the sanitized subject
-                SYSTEM_MESSAGE.content = `You are an interviewer. Your task is to assess the candidate's knowledge of ${sanitizedSubject}. You will ask exactly ${totalQuestions} ${sanitizedSubject} technical questions. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide any answers, feedback, hints, or evaluation until all ${totalQuestions} questions have been answered. At the end of the interview, provide a short, objective summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`;
+                updateSystemMessage();
 
                 // Proceed with the interview
                 proceedWithInterview();
@@ -496,7 +497,6 @@
     
     <script>
         // System set configuration
-        // const subjectInterview = "human resource management";
         const subjectInterview = ["manager", "specialist", "business partner"];
         let totalQuestions = parseInt(document.getElementById('questionsDropdown').value, 10); // initialize from dropdown
 
@@ -509,10 +509,24 @@
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('questionCount').textContent = totalQuestions;
         });
+
+        // Update SYSTEM_MESSAGE to use selectedSubject
+        function updateSystemMessage() {
+            SYSTEM_MESSAGE.content = `You are an interviewer. Your role is to assess the candidate's knowledge of ${selectedSubject}. You must ask exactly ${totalQuestions} technical questions about ${selectedSubject}. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide answers, feedback, hints, or evaluations until all ${totalQuestions} questions are completed. At the end of the interview, provide a short, objective summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`;
+        }
+
+        // Update selectedSubject when the dropdown changes
+        subjectDropdown.addEventListener('change', function () {
+            selectedSubject = this.value;
+            updateSystemMessage();
+        });
+
+        // Initialize SYSTEM_MESSAGE with the default selectedSubject
         const SYSTEM_MESSAGE = {
             role: "system",
-            content: `You are an interviewer. Your role is to assess the candidate's knowledge of ${subjectInterview}. You must ask exactly ${totalQuestions} technical questions about ${subjectInterview}. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide answers, feedback, hints, or evaluations until all ${totalQuestions} questions are completed. At the end of the interview, provide a short, objective summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`
+            content: ""
         };
+        updateSystemMessage();
 
         // Interview state
         let currentQuestion = 0;
@@ -525,58 +539,6 @@
         const QUESTION_TIME_LIMIT = 50; // seconds
 
 
-        function startInterview() {
-            apiKey = document.getElementById('apiKey').value.trim();
-            
-            if (!apiKey) {
-                alert('Please enter your OpenAI API key');
-                return;
-            }
-            
-            // Basic API key format validation
-            if (!apiKey.startsWith('sk-') || apiKey.length < 20) {
-                alert('Invalid API key format. OpenAI API keys start with "sk-" and are longer than 20 characters.');
-                document.getElementById('apiKey').focus();
-                return;
-            }
-            
-            // Show loading state
-            const startBtn = document.querySelector('.start-btn');
-            const originalText = startBtn.textContent;
-            startBtn.textContent = 'Validating API Key...';
-            startBtn.disabled = true;
-            
-            // Test API key with a simple request
-            testAPIKey().then(isValid => {
-                startBtn.textContent = originalText;
-                startBtn.disabled = false;
-                
-                if (isValid) {
-                    // API key is valid, proceed with interview
-                    proceedWithInterview();
-                } else {
-                    alert('Invalid API key. Please check your OpenAI API key and try again.');
-                    document.getElementById('apiKey').focus();
-                }
-            });
-        }
-
-        async function testAPIKey() {
-            try {
-                const response = await fetch('https://api.openai.com/v1/models', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${apiKey}`
-                    }
-                });
-                
-                return response.status === 200;
-            } catch (error) {
-                console.error('API key test failed:', error);
-                return false;
-            }
-        }
-
         function proceedWithInterview() {
             // Hide setup section and show interview sections
             document.getElementById('setupSection').style.display = 'none';
@@ -584,7 +546,7 @@
             document.getElementById('questionSection').style.display = 'block';
             document.getElementById('answerSection').style.display = 'block';
             
-            // Initialize conversation history with system message
+            // Initialize conversation history with updated SYSTEM_MESSAGE
             conversationHistory = [SYSTEM_MESSAGE];
             
             // Start the interview
@@ -662,7 +624,7 @@
             // Add initial prompt to start the interview
             conversationHistory.push({
                 role: 'user',
-                content: 'Please start the technical interview by asking your first question about ${subjectInterview}.'
+                content: `Start the technical interview by asking your first question about ${selectedSubject}. Respond with only the question text, nothing else.`
             });
             
             const result = await callOpenAI();
@@ -677,12 +639,10 @@
                 // Start the timer for this question
                 startQuestionTimer();
             } else {
-                // Handle different types of errors
+                // Handle errors
                 if (result.isAuthError) {
-                    // API key error - return to setup
                     handleAPIKeyError(result.error);
                 } else {
-                    // Other errors - show in question area but allow retry
                     document.getElementById('questionText').textContent = result.error;
                     setTimeout(() => {
                         if (confirm('Would you like to retry loading the question?')) {
@@ -904,3 +864,4 @@
     </script>
 </body>
 </html>
+``` 
