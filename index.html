@@ -366,20 +366,6 @@
         <div style="text-align:center; margin-bottom:24px;">
             <span id="typingText" style="font-size:1.2rem; color:var(--typing-text-color); font-weight:600; letter-spacing:1px;"></span>
         </div>
-        <script>
-            // Simple typing animation for "your AI interview assistant"
-            const typingText = "📄kstHR: Your AI Interview Partner";
-            const typingElem = document.getElementById('typingText');
-            let idx = 0;
-            function typeWriter() {
-            if (idx <= typingText.length) {
-                typingElem.textContent = typingText.slice(0, idx) + (idx < typingText.length ? "|" : "");
-                idx++;
-                setTimeout(typeWriter, 70);
-            }
-            }
-            typeWriter();
-        </script>
         
         <!-- Setup Section -->
         <div class="setup-section" id="setupSection">
@@ -390,11 +376,7 @@
                     <!-- Options will be dynamically populated -->
                 </select>, 
                 You'll be asked 
-                <select id="questionsDropdown">
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                </select>
+                <select id="questionsDropdown" aria-label="Number of questions"></select>
                 questions <b>adapted</b> to your knowledge level.
             </p>
             <input type="password" id="apiKey" placeholder="Enter your OpenAI API key" required>
@@ -404,55 +386,6 @@
                 <img src="kst.png" alt="kst Logo" style="max-width: 150px; height: auto;">
             </div>
         </div>
-        <script>
-            // Populate subjectDropdown with subjectInterview array values
-            const subjectInterviewOptions = ["HR Manager", "HR Specialist", "HR Recruiter"];
-            const subjectDropdown = document.getElementById('subjectDropdown');
-            subjectInterviewOptions.forEach(subject => {
-                const option = document.createElement('option');
-                option.value = subject;
-                option.textContent = subject;
-                subjectDropdown.appendChild(option);
-            });
-
-            let selectedSubject = subjectDropdown.value; // Default selected subject
-            subjectDropdown.addEventListener('change', function () {
-                selectedSubject = this.value;
-            });
-
-            // Sanitize user inputs to prevent prompt injection
-            function sanitizeInput(input) {
-                const div = document.createElement('div');
-                div.textContent = input;
-                return div.innerHTML;
-            }
-
-            function startInterview() {
-
-                apiKey = document.getElementById('apiKey').value.trim();
-                
-                if (!apiKey) {
-                    alert('Please enter your OpenAI API key');
-                    return;
-                }
-                
-                // Basic API key format validation
-                if (!apiKey.startsWith('sk-') || apiKey.length < 20) {
-                    alert('Invalid API key format. OpenAI API keys start with "sk-" and are longer than 20 characters.');
-                    document.getElementById('apiKey').focus();
-                    return;
-                }
-                
-                // Sanitize selected subject
-                const sanitizedSubject = sanitizeInput(selectedSubject);
-
-                // Update SYSTEM_MESSAGE with the sanitized subject
-                updateSystemMessage();
-
-                // Proceed with the interview
-                proceedWithInterview();
-            }
-        </script>
         
         <!-- Progress Section -->
         <div class="progress-section" id="progressSection">
@@ -470,7 +403,7 @@
             
             <!-- Timer Section -->
             <div class="timer-section" id="timerSection" style="display: none;">
-                <div>Time Remaining: <span class="timer-display" id="timerDisplay">30</span> seconds</div>
+                <div>Time Remaining: <span class="timer-display" id="timerDisplay">50</span> seconds</div>
                 <div class="timer-bar">
                     <div class="timer-fill" id="timerFill" style="width: 100%"></div>
                 </div>
@@ -496,48 +429,124 @@
     </div>
     
     <script>
-        // System set configuration
-        const subjectInterview = ["manager", "specialist", "business partner"];
-        let totalQuestions = parseInt(document.getElementById('questionsDropdown').value, 10); // initialize from dropdown
+        /**
+         * Extension point: edit INTERVIEW_CONFIG to add roles, question counts, model, and prompts.
+         * Do not store API keys here — users enter the key at runtime in the page.
+         */
+        const INTERVIEW_CONFIG = {
+            subjects: [
+                'Product Owner',
+                'DevOps Engineer',
+                'Frontend Engineer',
+                'Backend Engineer',
+                'Data Engineer',
+                'AI Engineer',
+                'Cybersecurity Engineer',
+            ],
+            questionCountOptions: [2, 3, 4, 5],
+            openAI: {
+                chatCompletionsUrl: 'https://api.openai.com/v1/chat/completions',
+                model: 'gpt-3.5-turbo',
+                maxTokens: 500,
+                temperature: 0.7,
+            },
+            questionTimeLimitSeconds: 50,
+            typingHeadline: '📄 Your AI Interview Partner',
+            typeWriterDelayMs: 70,
 
-        document.getElementById('questionsDropdown').addEventListener('change', function(e) {
+            buildSystemPrompt(subject, totalQuestions) {
+                return `You are an interviewer. Your role is to assess the candidate's knowledge of ${subject}. You must ask exactly ${totalQuestions} technical questions about ${subject}. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide answers, feedback, hints, or evaluations until all ${totalQuestions} questions are completed. At the end of the interview, provide a short, objective summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`;
+            },
+            buildFirstQuestionMessage(subject) {
+                return `Start the technical interview by asking your first question about ${subject}. Respond with only the question text, nothing else.`;
+            },
+            buildFinalSummaryMessage(totalQuestions) {
+                return `All ${totalQuestions} questions have been answered. Please provide your final assessment summary.`;
+            },
+        };
+
+        const QUESTION_TIME_LIMIT = INTERVIEW_CONFIG.questionTimeLimitSeconds;
+
+        const subjectDropdown = document.getElementById('subjectDropdown');
+        const questionsDropdown = document.getElementById('questionsDropdown');
+
+        INTERVIEW_CONFIG.questionCountOptions.forEach((n) => {
+            const opt = document.createElement('option');
+            opt.value = String(n);
+            opt.textContent = String(n);
+            questionsDropdown.appendChild(opt);
+        });
+        questionsDropdown.value = '3';
+
+        INTERVIEW_CONFIG.subjects.forEach((label) => {
+            const opt = document.createElement('option');
+            opt.value = label;
+            opt.textContent = label;
+            subjectDropdown.appendChild(opt);
+        });
+
+        let selectedSubject = subjectDropdown.value;
+        let totalQuestions = parseInt(questionsDropdown.value, 10);
+
+        questionsDropdown.addEventListener('change', function (e) {
             totalQuestions = parseInt(e.target.value, 10);
-            document.getElementById('questionCount').textContent = totalQuestions;
-        });
-        
-
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('questionCount').textContent = totalQuestions;
+            updateSystemMessage();
+            syncInitialProgressLabel();
         });
 
-        // Update SYSTEM_MESSAGE to use selectedSubject
-        function updateSystemMessage() {
-            SYSTEM_MESSAGE.content = `You are an interviewer. Your role is to assess the candidate's knowledge of ${selectedSubject}. You must ask exactly ${totalQuestions} technical questions about ${selectedSubject}. The first question should be of moderate difficulty. Each subsequent question should adapt in difficulty depending on how the candidate answered the previous one (easier if they struggled, more advanced if they succeeded). Do not provide answers, feedback, hints, or evaluations until all ${totalQuestions} questions are completed. At the end of the interview, provide a short, objective summary evaluating the candidate's knowledge level, highlighting their strengths and areas for improvement.`;
-        }
-
-        // Update selectedSubject when the dropdown changes
         subjectDropdown.addEventListener('change', function () {
             selectedSubject = this.value;
             updateSystemMessage();
         });
 
-        // Initialize SYSTEM_MESSAGE with the default selectedSubject
-        const SYSTEM_MESSAGE = {
-            role: "system",
-            content: ""
-        };
-        updateSystemMessage();
+        const SYSTEM_MESSAGE = { role: 'system', content: '' };
 
-        // Interview state
+        function updateSystemMessage() {
+            SYSTEM_MESSAGE.content = INTERVIEW_CONFIG.buildSystemPrompt(selectedSubject, totalQuestions);
+        }
+
+        function syncInitialProgressLabel() {
+            document.getElementById('progressText').textContent = `Question 0 of ${totalQuestions}`;
+        }
+
+        function runTypingHeadline() {
+            const el = document.getElementById('typingText');
+            const text = INTERVIEW_CONFIG.typingHeadline;
+            let i = 0;
+            function step() {
+                if (i <= text.length) {
+                    el.textContent = text.slice(0, i) + (i < text.length ? '|' : '');
+                    i++;
+                    setTimeout(step, INTERVIEW_CONFIG.typeWriterDelayMs);
+                }
+            }
+            step();
+        }
+
+        updateSystemMessage();
+        syncInitialProgressLabel();
+        runTypingHeadline();
+
         let currentQuestion = 0;
         let apiKey = '';
         let conversationHistory = [];
-        
-        // Timer state
         let questionTimer = null;
-        let timeRemaining = 50;
-        const QUESTION_TIME_LIMIT = 50; // seconds
+        let timeRemaining = QUESTION_TIME_LIMIT;
 
+        function startInterview() {
+            apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey) {
+                alert('Please enter your OpenAI API key');
+                return;
+            }
+            if (!apiKey.startsWith('sk-') || apiKey.length < 20) {
+                alert('Invalid API key format. OpenAI API keys start with "sk-" and are longer than 20 characters.');
+                document.getElementById('apiKey').focus();
+                return;
+            }
+            updateSystemMessage();
+            proceedWithInterview();
+        }
 
         function proceedWithInterview() {
             // Hide setup section and show interview sections
@@ -620,26 +629,23 @@
 
         async function getFirstQuestion() {
             document.getElementById('questionText').textContent = 'Loading first question...';
-            
-            // Add initial prompt to start the interview
+
             conversationHistory.push({
                 role: 'user',
-                content: `Start the technical interview by asking your first question about ${selectedSubject}. Respond with only the question text, nothing else.`
+                content: INTERVIEW_CONFIG.buildFirstQuestionMessage(selectedSubject),
             });
-            
+
             const result = await callOpenAI();
-            
+
             if (result.success) {
                 document.getElementById('questionText').textContent = result.response;
                 conversationHistory.push({
                     role: 'assistant',
-                    content: result.response
+                    content: result.response,
                 });
-                
-                // Start the timer for this question
                 startQuestionTimer();
             } else {
-                // Handle errors
+                conversationHistory.pop();
                 if (result.isAuthError) {
                     handleAPIKeyError(result.error);
                 } else {
@@ -656,19 +662,22 @@
         }
 
         function handleAPIKeyError(errorMessage) {
-            // Stop any running timer
             stopQuestionTimer();
-            
-            // Show error message
             alert(errorMessage + '\n\nReturning to setup screen to enter a new API key.');
-            
-            // Reset to setup screen but keep question/answer sections visible for context
+
             document.getElementById('setupSection').style.display = 'block';
+            document.getElementById('progressSection').style.display = 'none';
+            document.getElementById('questionSection').style.display = 'none';
+            document.getElementById('answerSection').style.display = 'none';
+            document.getElementById('finalSummary').style.display = 'none';
             document.getElementById('questionText').textContent = 'Please enter a valid API key and restart the interview.';
-            
-            // Clear API key field for new input
+
             document.getElementById('apiKey').value = '';
             document.getElementById('apiKey').focus();
+            currentQuestion = 0;
+            conversationHistory = [];
+            syncInitialProgressLabel();
+            document.getElementById('progressFill').style.width = '0%';
         }
 
         async function proceedToNextQuestion() {
@@ -749,10 +758,9 @@
             document.getElementById('progressFill').style.width = '100%';
             document.getElementById('progressText').textContent = 'Interview Complete';
             
-            // Request final summary
             conversationHistory.push({
                 role: 'user',
-                content: `All ${totalQuestions} questions have been answered. Please provide your final assessment summary.`
+                content: INTERVIEW_CONFIG.buildFinalSummaryMessage(totalQuestions),
             });
             
             document.getElementById('finalSummary').style.display = 'block';
@@ -769,29 +777,31 @@
 
         function skipQuestion() {
             if (confirm('Are you sure you want to skip this question?')) {
+                stopQuestionTimer();
                 conversationHistory.push({
                     role: 'user',
-                    content: 'I would like to skip this question.'
+                    content: 'I would like to skip this question.',
                 });
-
+                document.getElementById('answerText').value = '';
                 proceedToNextQuestion();
             }
         }
 
         async function callOpenAI() {
+            const { chatCompletionsUrl, model, maxTokens, temperature } = INTERVIEW_CONFIG.openAI;
             try {
-                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                const response = await fetch(chatCompletionsUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
+                        'Authorization': `Bearer ${apiKey}`,
                     },
                     body: JSON.stringify({
-                        model: 'gpt-3.5-turbo', // model selection
+                        model,
                         messages: conversationHistory,
-                        max_tokens: 500,
-                        temperature: 0.7
-                    })
+                        max_tokens: maxTokens,
+                        temperature,
+                    }),
                 });
                 
                 const data = await response.json();
@@ -831,10 +841,12 @@
         }
 
         function resetInterview() {
-            // Stop any running timer
             stopQuestionTimer();
-            
-            // Reset all state variables
+
+            totalQuestions = parseInt(questionsDropdown.value, 10);
+            selectedSubject = subjectDropdown.value;
+            updateSystemMessage();
+
             currentQuestion = 0;
             apiKey = '';
             conversationHistory = [];
@@ -848,7 +860,7 @@
             
             // Reset progress
             document.getElementById('progressFill').style.width = '0%';
-            document.getElementById('progressText').textContent = 'Question 0 of 3';
+            document.getElementById('progressText').textContent = `Question 0 of ${totalQuestions}`;
             
             // Reset timer display
             document.getElementById('timerDisplay').textContent = QUESTION_TIME_LIMIT;
@@ -864,4 +876,3 @@
     </script>
 </body>
 </html>
-``` 
