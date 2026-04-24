@@ -139,6 +139,21 @@
             font-weight: 500;
         }
         
+        .field-block {
+            margin: 16px 0 8px 0;
+        }
+        .field-block label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .field-hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin: 4px 0 0 0;
+        }
         input[type="password"], input[type="text"] {
             width: 100%;
             max-width: 400px;
@@ -371,16 +386,20 @@
         <div class="setup-section" id="setupSection">
             <h3>Interview Setup</h3>
             <p>
-                This is a technical interview concerning 
-                <select id="subjectDropdown">
-                    <!-- Options will be dynamically populated -->
-                </select>, 
-                You'll be asked 
+                This is a technical interview for the <b>job or role</b> you specify below. You'll be asked
                 <select id="questionsDropdown" aria-label="Number of questions"></select>
                 questions <b>adapted</b> to your knowledge level.
             </p>
-            <input type="password" id="apiKey" placeholder="Enter your OpenAI API key" required>
-            <br>
+            <div class="field-block">
+                <label for="jobRoleInput">Target job or role</label>
+                <input type="text" id="jobRoleInput" name="jobRole" autocomplete="organization-title" list="jobRoleSuggestions" placeholder="">
+                <p class="field-hint" id="jobRoleHint"></p>
+                <datalist id="jobRoleSuggestions"></datalist>
+            </div>
+            <div class="field-block">
+                <label for="apiKey">OpenAI API key</label>
+                <input type="password" id="apiKey" placeholder="Enter your OpenAI API key" required>
+            </div>
             <button class="start-btn" onclick="startInterview()">Start Interview</button>
             <div style="text-align: center; margin-top: 16px;">
                 <img src="kst.png" alt="kst Logo" style="max-width: 150px; height: auto;">
@@ -430,19 +449,27 @@
     
     <script>
         /**
-         * Extension point: edit INTERVIEW_CONFIG to add roles, question counts, model, and prompts.
-         * Do not store API keys here — users enter the key at runtime in the page.
+         * Extension point: model, question counts, prompts, and optional job-role UI hints.
+         * The job/role is entered by the user in the form (not stored in this file). API key is only entered at runtime.
          */
         const INTERVIEW_CONFIG = {
-            subjects: [
-                'Product Owner',
-                'DevOps Engineer',
-                'Frontend Engineer',
-                'Backend Engineer',
-                'Data Engineer',
-                'AI Engineer',
-                'Cybersecurity Engineer',
-            ],
+            jobRole: {
+                placeholder: 'e.g. Senior Backend Engineer, HR Business Partner, …',
+                /** Shown as helper text under the field; set to "" to hide */
+                hint: 'Name the position or topic for this screening. Suggestions may appear as you type.',
+                /** Optional: fills the <datalist> for browser autocomplete; keep empty [] to disable */
+                suggestedRoles: [
+                    'Product Owner',
+                    'DevOps Engineer',
+                    'Frontend Engineer',
+                    'Backend Engineer',
+                    'Data Engineer',
+                    'AI Engineer',
+                    'Cybersecurity Engineer',
+                ],
+                minLength: 2,
+                maxLength: 200,
+            },
             questionCountOptions: [2, 3, 4, 5],
             openAI: {
                 chatCompletionsUrl: 'https://api.openai.com/v1/chat/completions',
@@ -467,8 +494,28 @@
 
         const QUESTION_TIME_LIMIT = INTERVIEW_CONFIG.questionTimeLimitSeconds;
 
-        const subjectDropdown = document.getElementById('subjectDropdown');
+        const jobRoleInput = document.getElementById('jobRoleInput');
         const questionsDropdown = document.getElementById('questionsDropdown');
+        const jobRoleSuggestions = document.getElementById('jobRoleSuggestions');
+        const jobRoleHintEl = document.getElementById('jobRoleHint');
+
+        (function initJobRoleField() {
+            const j = INTERVIEW_CONFIG.jobRole;
+            jobRoleInput.placeholder = j.placeholder;
+            jobRoleInput.maxLength = j.maxLength;
+            jobRoleInput.setAttribute('maxlength', String(j.maxLength));
+            jobRoleHintEl.textContent = j.hint || '';
+            jobRoleHintEl.style.display = j.hint ? 'block' : 'none';
+            j.suggestedRoles.forEach((label) => {
+                const opt = document.createElement('option');
+                opt.value = label;
+                jobRoleSuggestions.appendChild(opt);
+            });
+        })();
+
+        function readJobRole() {
+            return jobRoleInput.value.trim();
+        }
 
         INTERVIEW_CONFIG.questionCountOptions.forEach((n) => {
             const opt = document.createElement('option');
@@ -478,14 +525,7 @@
         });
         questionsDropdown.value = '3';
 
-        INTERVIEW_CONFIG.subjects.forEach((label) => {
-            const opt = document.createElement('option');
-            opt.value = label;
-            opt.textContent = label;
-            subjectDropdown.appendChild(opt);
-        });
-
-        let selectedSubject = subjectDropdown.value;
+        let selectedSubject = '';
         let totalQuestions = parseInt(questionsDropdown.value, 10);
 
         questionsDropdown.addEventListener('change', function (e) {
@@ -494,15 +534,21 @@
             syncInitialProgressLabel();
         });
 
-        subjectDropdown.addEventListener('change', function () {
-            selectedSubject = this.value;
-            updateSystemMessage();
+        jobRoleInput.addEventListener('input', function () {
+            if (currentQuestion === 0) {
+                updateSystemMessage();
+            }
         });
 
         const SYSTEM_MESSAGE = { role: 'system', content: '' };
 
         function updateSystemMessage() {
-            SYSTEM_MESSAGE.content = INTERVIEW_CONFIG.buildSystemPrompt(selectedSubject, totalQuestions);
+            const role = currentQuestion > 0 ? selectedSubject : readJobRole();
+            if (!role) {
+                SYSTEM_MESSAGE.content = '';
+                return;
+            }
+            SYSTEM_MESSAGE.content = INTERVIEW_CONFIG.buildSystemPrompt(role, totalQuestions);
         }
 
         function syncInitialProgressLabel() {
@@ -534,6 +580,26 @@
         let timeRemaining = QUESTION_TIME_LIMIT;
 
         function startInterview() {
+            const role = readJobRole();
+            if (!role) {
+                alert('Please enter the target job or role for this interview.');
+                jobRoleInput.focus();
+                return;
+            }
+            const { minLength, maxLength } = INTERVIEW_CONFIG.jobRole;
+            if (role.length < minLength) {
+                alert(`Job or role must be at least ${minLength} characters.`);
+                jobRoleInput.focus();
+                return;
+            }
+            if (role.length > maxLength) {
+                alert(`Job or role must be at most ${maxLength} characters.`);
+                jobRoleInput.focus();
+                return;
+            }
+
+            selectedSubject = role;
+
             apiKey = document.getElementById('apiKey').value.trim();
             if (!apiKey) {
                 alert('Please enter your OpenAI API key');
@@ -675,7 +741,9 @@
             document.getElementById('apiKey').value = '';
             document.getElementById('apiKey').focus();
             currentQuestion = 0;
+            selectedSubject = readJobRole();
             conversationHistory = [];
+            updateSystemMessage();
             syncInitialProgressLabel();
             document.getElementById('progressFill').style.width = '0%';
         }
@@ -844,10 +912,10 @@
             stopQuestionTimer();
 
             totalQuestions = parseInt(questionsDropdown.value, 10);
-            selectedSubject = subjectDropdown.value;
+            currentQuestion = 0;
+            selectedSubject = readJobRole();
             updateSystemMessage();
 
-            currentQuestion = 0;
             apiKey = '';
             conversationHistory = [];
             timeRemaining = QUESTION_TIME_LIMIT;
