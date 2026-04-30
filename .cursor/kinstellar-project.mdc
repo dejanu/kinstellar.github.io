@@ -1,0 +1,29 @@
+---
+description: KinStellar GitHub Pages site structure and conventions
+alwaysApply: true
+---
+
+# KinStellar (`kinstellar.github.io`)
+
+Static **GitHub Pages** site — no bundler, framework, or server code.
+
+## Entry point
+
+- **`index.html`** is the entire app: markup, inline `<style>` (design tokens + layout), and inline `<script>` (OpenAI chat flow). Prefer editing this file over adding new pipelines unless requirements clearly need them.
+
+## Where logic and copy live
+
+- **`INTERVIEW_CONFIG`** (top of the main `<script>`): model, URLs, tokens, temperature, question counts, timer, typing headline, job-role hints, and **`buildSystemPrompt` / `buildFirstQuestionMessage` / `buildFinalSummaryMessage`**. Tune interview behavior and wording here first.
+- **Flow**: `startInterview` → `proceedWithInterview` → `getFirstQuestion` / `proceedToNextQuestion` → `submitAnswer` / `skipQuestion` → `finishInterview`; **`callOpenAI`** posts to OpenAI Chat Completions with **`conversationHistory`**.
+- **`style.css`** is **not** linked from `index.html`; it targets `#map` (Leaflet-era stub). Treat as legacy unless explicitly wiring a map page.
+- **`githubapi_endpoints.md`** is **notes only**, not imported by the app.
+
+## Editing constraints
+
+- Many DOM **`id`s** are referenced from script; renaming elements requires updating the matching `getElementById` usage.
+- The page loads **`skillpulse.gif`** and **`kst.png`**; keep paths consistent or replace assets in-repo.
+
+## Contribution style
+
+- Match existing inline CSS/JS style; keep changes **minimal and scoped** to the request (this repo favors a single-file app).
+- The OpenAI API key is collected in the browser and sent client-side — do not introduce server-side assumptions without an explicit architectural change.
