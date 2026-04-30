@@ -527,6 +527,11 @@
 
         let selectedSubject = '';
         let totalQuestions = parseInt(questionsDropdown.value, 10);
+        let currentQuestion = 0;
+        let apiKey = '';
+        let conversationHistory = [];
+        let questionTimer = null;
+        let timeRemaining = QUESTION_TIME_LIMIT;
 
         questionsDropdown.addEventListener('change', function (e) {
             totalQuestions = parseInt(e.target.value, 10);
@@ -572,12 +577,6 @@
         updateSystemMessage();
         syncInitialProgressLabel();
         runTypingHeadline();
-
-        let currentQuestion = 0;
-        let apiKey = '';
-        let conversationHistory = [];
-        let questionTimer = null;
-        let timeRemaining = QUESTION_TIME_LIMIT;
 
         function startInterview() {
             const role = readJobRole();
