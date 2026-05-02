@@ -58,7 +58,7 @@ Requirement: Python 3.10+ (the MCP Python SDK does not support Python 3.9).
 
 #### Example MCP client config
 
-Use a stdio server entry similar to:
+* Add the mcp config to claude desktop: `/Users/YOURUSER/Library/Application Support/Claude/claude_desktop_config.json` or to claude code:
 
 ```json
 {
