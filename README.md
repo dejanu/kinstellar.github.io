@@ -2,7 +2,12 @@
 
 Your own AI interview assistant, tl;dr motivation [here](https://dejanualex.medium.com/reshaping-the-job-market-5be1b4afab01)
 
-Page accessible at: [itmapper](https://itmapper.github.io)
+A lightweight, static web app for running an AI-powered mock technical interview in the browser. Page accessible at: [itmapper](https://itmapper.github.io)
+
+  - It lets a user enter a topic, choose question count, provide an OpenAI API key, and answer adaptive interview questions.
+  - The app tracks progress and returns a final summary/assessment after all answers.
+  - Architecture is intentionally simple: mostly index.html (UI + logic), hosted on GitHub Pages, with no backend in this repo.
+
 
 ### Architecture
 
