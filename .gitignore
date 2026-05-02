@@ -40,6 +40,7 @@ next-env.d.ts
 
 # Python (scoped to mcp_server only)
 mcp_server/.venv/
+mcp_server/.venv*/
 mcp_server/venv/
 mcp_server/env/
 mcp_server/__pycache__/
