@@ -34,3 +34,46 @@ flowchart LR
 
 - **index.html** bundles markup, inline CSS, and interview logic.
 - The OpenAI **API key** is supplied in the form at runtime and sent only from the browser to OpenAI (not stored by this site).
+
+### Python MCP server (`interviewnow`)
+
+This repo now includes a minimal MCP server at `mcp_server/server.py` that provides:
+- Prompt: `interviewnow`
+- Tool: `open_interview_page`
+
+`interviewnow` is designed to start the flow by opening `https://itmapper.github.io/` in the default browser, then guiding the user to start the interview from the page.
+
+#### Setup
+
+```bash
+cd mcp_server
+uv sync
+uv run server.py
+
+# start inspector
+uv run mcp dev
+```
+
+Requirement: Python 3.10+ (the MCP Python SDK does not support Python 3.9).
+
+#### Example MCP client config
+
+Use a stdio server entry similar to:
+
+```json
+{
+  "mcpServers": {
+    "itmapperInterview": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/tmp/mcp_server/itmapper.github.io/mcp_server",
+        "run",
+        "server.py"
+      ]
+    }
+  }
+}
+```
+
+After connecting the server in your MCP client, invoke the `interviewnow` prompt to begin.

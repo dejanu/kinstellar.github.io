@@ -37,3 +37,22 @@ next-env.d.ts
 
 # custom
 .env
+
+# Python (scoped to mcp_server only)
+mcp_server/.venv/
+mcp_server/venv/
+mcp_server/env/
+mcp_server/__pycache__/
+mcp_server/*.py[cod]
+mcp_server/*$py.class
+mcp_server/build/
+mcp_server/dist/
+mcp_server/*.egg-info/
+mcp_server/.eggs/
+mcp_server/pip-wheel-metadata/
+mcp_server/.pytest_cache/
+mcp_server/.mypy_cache/
+mcp_server/.ruff_cache/
+mcp_server/.coverage
+mcp_server/.coverage.*
+mcp_server/htmlcov/
